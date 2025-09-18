@@ -166,7 +166,7 @@ c3_pooled_width = conv_output_width(c3_conv_width, pool_kernel, pool_kernel/2, p
 print("C3: ", c3_conv_width)
 print('P3: ', c3_pooled_width)
 
-c4_kernel = 3
+c4_kernel = 1
 c4_out = 512
 c4_conv_width = conv_output_width(c3_pooled_width, c4_kernel, c4_kernel/2, 1)
 c4_pooled_width = conv_output_width(c4_conv_width, pool_kernel, pool_kernel/2, pool_kernel)

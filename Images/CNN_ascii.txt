@@ -5,20 +5,26 @@
  # │
  # ▼
  # ┌───────────────────────────────────────┐
- # │ Conv2d (cin= 3, cout= 16, kernel_size= 3, stride= 1, padding= 1) │
- # │ → ReLU → MaxPool2d(kernel_size= 2, stride= 2) │
+ # │ Conv2d (cin= 3, cout= 64, k= 9, str= 1, pad= 1)   │
+ # │ → BN → ReLU → MaxPool2d(k= 2, str= 2)             │
  # └───────────────────────────────────────┘
  # │
  # ▼
  # ┌───────────────────────────────────────┐
- # │ Conv2d (cin= 16, cout= 32, kernel_size= 3, stride= 1, padding= 1) │
- # │ → ReLU → MaxPool2d(kernel_size= 2, stride= 2) │
+ # │ Conv2d (cin= 64, cout= 128, k= 5, str= 1, pad= 1) │
+ # │ → BN → ReLU → MaxPool2d(k= 2, str= 2)             │
  # └───────────────────────────────────────┘
  # │
  # ▼
  # ┌───────────────────────────────────────┐
- # │ Conv2d (cin= 32, cout= 64, kernel_size= 3, stride= 1, padding= 1) │
- # │ → ReLU → MaxPool2d(kernel_size= 2, stride= 2) │
+ # │ Conv2d (cin= 128, cout= 256, k= 3, str= 1, pad= 1)│
+ # │ → BN → ReLU → MaxPool2d(k= 2, str= 2)             │
+ # └───────────────────────────────────────┘
+ # │
+ # ▼
+ # ┌───────────────────────────────────────┐
+ # │ Conv2d (cin=256, cout=512, k= 1, str= 1, padd= 1) │
+ # │ → BN → ReLU → MaxPool2d(k= 2, str= 2)             │
  # └───────────────────────────────────────┘
  # │
  # ▼
@@ -26,14 +32,20 @@
  # │
  # ▼
  # ┌───────────────────────────────────────┐
- # │ Linear (fin= 64·H·W, fout= 128) │
- # │ → ReLU │
+ # │ Linear (fin= 64·H·W, fout= 1024)                  │
+ # │ → Dropout → ReLU 								   │
  # └───────────────────────────────────────┘
  # │
  # ▼
  # ┌───────────────────────────────────────┐
- # │ Linear (fin= 128, fout=NUM_CLASSES) │
- # │ → Softmax (or LogSoftmax) │
+ # │ Linear (fin= 1024, fout= 2048)                    │
+ # │ → Dropout → ReLU 								   │
+ # └───────────────────────────────────────┘
+ # │
+ # ▼
+ # ┌───────────────────────────────────────┐
+ # │ Linear (fin= 128, fout=NUM_CLASSES)               │
+ # │ → Sigmoid      								   │
  # └───────────────────────────────────────┘
  # │
  # ▼
