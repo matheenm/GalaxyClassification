@@ -228,7 +228,7 @@ class Net(nn.Module):
 
     def forward(self, x):
         # Conv layers
-        x = self.pool1(F.relu(self.conv1_bn(x)))
+        x = self.pool1(F.relu(self.conv1_bn(self.conv1(x))))
         x = self.pool2(F.relu(self.conv2_bn(self.conv2(x))))
         x = self.pool3(F.relu(self.conv3_bn(self.conv3(x))))
         x = self.pool4(F.relu(self.conv4_bn(self.conv4(x))))
