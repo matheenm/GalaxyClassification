@@ -8,12 +8,14 @@
 I used the dataset from  Galaxy Zoo - The Galaxy Challenge on [kaggle.com](www.kaggle.com):
 
 https://www.kaggle.com/competitions/galaxy-zoo-the-galaxy-challenge/data
+*kaggle competitions download galaxy-zoo-the-galaxy-challenge*
 
 The code uses the **images_training_rev1.zip** which has the images and **training_solutions_rev1.zip** which has the labelled soultions.
 
 ## Convolution Neural Network
 
 ## Loss
+![Loss](https://github.com/matheenm/GalaxyClassification/blob/main/Images/Loss.png)
 
 ## Reference
 
