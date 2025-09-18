@@ -14,6 +14,11 @@ The code uses the **images_training_rev1.zip** which has the images and **traini
 
 ## Convolution Neural Network
 
+## Code
+
+The code is broken down into two parts. The preprocessing which crops the images into a region of interest and generates 64x64 images. 
+The second part trains the neural network.
+
 ## Loss
 ![Loss](https://github.com/matheenm/GalaxyClassification/blob/main/Images/Loss.png)
 
