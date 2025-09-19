@@ -14,6 +14,7 @@ The code uses the **images_training_rev1.zip** which has the images and **traini
 
 ## Labelled Examples
 
+![Example](https://github.com/matheenm/GalaxyClassification/blob/main/Images/Galaxy_Example.png)
 ## Convolution Neural Network
 
 The model is small enough that it can be run on a CPU itself. 
