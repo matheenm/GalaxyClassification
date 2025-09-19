@@ -80,9 +80,6 @@ There is also a helper program **plot_image.py** which can plot out any galaxy i
 epoch 10, batch 26 - loss: 0.0179
 ![Loss](https://github.com/matheenm/GalaxyClassification/blob/main/Images/training_loss.png)
 
-Validation sample RMSE error =  0.1074
-Test sample RMSE error =  0.1069
-
 ## Example classifications
 
 ![test1](https://github.com/matheenm/GalaxyClassification/blob/main/Images/test_1.png)
