@@ -20,6 +20,7 @@ random.seed(SEED)
 TRAINING_IMAGES = "galaxy_data/images_training_rev1/"
 os.makedirs("galaxy_data/processed", exist_ok=True)
 DIR_PROCESSED = 'galaxy_data/processed/'
+TEST_IMAGES = "galaxy_data/test_results/"
 
 PREPROCESSED_IMAGE_DIM = 64
 
@@ -104,9 +105,9 @@ def batch_generator(pics, labels, batch_size, rotate=False):
     '''
     angles = np.array([0,90,180,270])
     labels = torch.tensor(labels, dtype=torch.float32)
-    l = len(pics)
-    batches = int(l/batch_size)
-    leftover = l % batch_size
+    numer_of_pics = len(pics)
+    batches = int(numer_of_pics/batch_size)
+    remainder = numer_of_pics % batch_size
     for batch in range(batches):
         start = batch * batch_size
         this_batch = pics[start:start+batch_size]
@@ -121,18 +122,19 @@ def batch_generator(pics, labels, batch_size, rotate=False):
                             for pic in this_batch], dtype=torch.float32).permute(0, 3, 1, 2), batch_labels, this_batch
         else:
             yield torch.tensor([ plt.imread(DIR_PROCESSED + pic, format='png') for pic in this_batch], dtype=torch.float32).permute(0, 3, 1, 2), batch_labels, this_batch
-    start = batches * batch_size
-    this_batch = pics[start:start+leftover]
-    batch_labels = labels[start:start+leftover,:]
-    if rotate:
-        yield torch.tensor([scipy.ndimage.rotate(
+    if(remainder > 0):
+        start = batches * batch_size
+        this_batch = pics[start:start+remainder]
+        batch_labels = labels[start:start+remainder,:]
+        if rotate:
+            yield torch.tensor([scipy.ndimage.rotate(
                             plt.imread(DIR_PROCESSED + pic, format='png'),
                             reshape=False,
                             angle=np.random.randint(0,360)
                             )
                         for pic in this_batch], dtype=torch.float32).permute(0, 3, 1, 2), batch_labels, this_batch
-    
-    yield torch.tensor([ plt.imread(DIR_PROCESSED + pic, format='png') for pic in this_batch], dtype=torch.float32).permute(0, 3, 1, 2), batch_labels, this_batch
+        else:
+            yield torch.tensor([ plt.imread(DIR_PROCESSED + pic, format='png') for pic in this_batch], dtype=torch.float32).permute(0, 3, 1, 2), batch_labels, this_batch
     
 
 
@@ -166,7 +168,7 @@ c3_pooled_width = conv_output_width(c3_conv_width, pool_kernel, pool_kernel/2, p
 print("C3: ", c3_conv_width)
 print('P3: ', c3_pooled_width)
 
-c4_kernel = 1
+c4_kernel = 3
 c4_out = 512
 c4_conv_width = conv_output_width(c3_pooled_width, c4_kernel, c4_kernel/2, 1)
 c4_pooled_width = conv_output_width(c4_conv_width, pool_kernel, pool_kernel/2, pool_kernel)
@@ -288,7 +290,7 @@ for epoch in range(num_epochs):
 plt.title('Training Loss over batches')
 plt.xlabel('Batch')
 plt.ylabel('weighted mean square error Loss')
-plt.plot([error[2] for error in loss_tracking])
+plt.plot([error[2] for error in loss_tracking],color='orange')
 plt.savefig('training_loss.png')
 
 val_data = batch_generator(x_val,y_val,batch_size=1000)
@@ -299,13 +301,52 @@ for val_images, val_labels , _ in val_data:
 prediction_error = root_mean_square_error(y_val, predicted_labels)
 print("Validation sample RMSE error = ",prediction_error)
 
-test_data = batch_generator(x_test,y_test,batch_size=1000)
+galaxy_shape = ['Smooth','Featured or disc','Star or artifact','Edge on','Not edge on','Bar through center','No bar','Spiral','No Spiral','No bulge','Just noticeable bulge','Obvious bulge','Dominant bulge','Odd Feature','No Odd Feature','Completely round','In between','Cigar shaped','Ring (Oddity)','Lens or arc (Oddity)','Disturbed (Oddity)','Irregular (Oddity)','Other (Oddity)','Merger (Oddity)','Dust lane (Oddity)','Rounded bulge','Boxy bulge','No bulge','Tightly wound arms','Medium wound arms','Loose wound arms','1 Spiral Arm','2 Spiral Arms','3 Spiral Arms','4 Spiral Arms','More than four Spiral Arms',"Can't tell"]
+
+test_size=1000 # just do 1000 for now, else will run out of memory
+os.makedirs(TEST_IMAGES, exist_ok=True)
+test_data = batch_generator(x_test[0:test_size],y_test[0:test_size],batch_size=test_size)
+selected_x = x_test[0:test_size]
 predicted_labels = np.empty((0,len(classes)), float)
 for test_images, test_labels , _ in test_data:
     outputs = net(test_images)
-    predicted_labels = np.append(predicted_labels, outputs.detach().numpy(), axis=0)
-prediction_error = root_mean_square_error(y_test, predicted_labels)
+    predicted_labels = np.append(predicted_labels, outputs.detach().numpy(), axis=0) 
+    count = 0
+    for ite in range(test_size):
+        gal_id = selected_x.iloc[count].split('.')[0]
+        fig = plt.figure('Galaxy_Example', figsize=(20, 20))
+        # Create axes for the image (left 80% of the figure width)
+        ax_img = fig.add_axes([0, 0, 0.8, 1])  # [left, bottom, width, height]
+        ax_img.axis('off')
+        ax_img.tick_params(axis='both', which='both', 
+               left=False, top=False, right=False, bottom=False,
+               labelleft=False, labeltop=False, labelright=False, labelbottom=False)
+
+        # Load and display the image
+        img = plt.imread(f'{TRAINING_IMAGES}{gal_id}.jpg', format='jpg')
+        ax_img.imshow(img, aspect='auto')
+        probs = outputs.detach().numpy()[count]# row_array = labels[labels['GalaxyID'] == gal_id].values[0][1:]
+        text=''
+        it=0
+        for typ in classes:
+            text = text + f'\n{galaxy_shape[it]} = {probs[it].item():.2f}'
+            it+=1
+        text = f'ID: {gal_id}{text}'
+        # Place text in the white space (right 20% of the figure)
+        fig.text(0.9, 0.5, text, fontsize= 20, ha='center', va='center')
+        save_path = os.path.join(TEST_IMAGES, f"{gal_id}.png")
+        plt.savefig(save_path, bbox_inches='tight')
+        plt.close()
+        count = count + 1
+
+prediction_error = root_mean_square_error(y_test[0:test_size], predicted_labels)
 print("Test sample RMSE error = ",prediction_error)
+
+
+
+
+
+
 
 
 
