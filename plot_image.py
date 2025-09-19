@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from PIL import Image
 
 TRAINING_IMAGES = "galaxy_data/images_training_rev1/"
 labels = pd.read_csv('galaxy_data/training_solutions_rev1.csv')
@@ -15,17 +16,31 @@ for cl,gs in zip(classes,galaxy_shape):
 
 gal_id = 495381
 
-size = 15
-fig = plt.figure('Galaxy_Example', figsize=(20,20))
-plt.axis('off')
-plt.tick_params(axis='both', left='off', top='off', right='off', bottom='off', labelleft='off', labeltop='off', labelright='off', labelbottom='off')
+
+fig = plt.figure('Galaxy_Example', figsize=(20, 20))
+# Create axes for the image (left 80% of the figure width)
+ax_img = fig.add_axes([0, 0, 0.8, 1])  # [left, bottom, width, height]
+ax_img.axis('off')
+ax_img.tick_params(axis='both', which='both', 
+                   left=False, top=False, right=False, bottom=False,
+                   labelleft=False, labeltop=False, labelright=False, labelbottom=False)
+
+# Load and display the image
 img = plt.imread(f'{TRAINING_IMAGES}{gal_id}.jpg', format='jpg')
-plt.imshow(img, aspect='auto')
-typ = labels[labels['GalaxyID'] == gal_id].drop('GalaxyID', axis= 1).idxmax(axis= 1).iloc[0]
-plt.title(f'ID: {gal_id}, class= {galaxt_type_tupple[classes.index(typ)][1]}', fontsize=20)
-plt.axis('off')
-plt.imshow(img, aspect='auto')
-fig.tight_layout(pad=1.0)
-plt.savefig('Galaxy_Example.png')
+ax_img.imshow(img, aspect='auto')
+probs = row_array = labels[labels['GalaxyID'] == gal_id].values[0][1:]
+text=''
+it=0
+for typ in classes:
+    text = text + f'\n{galaxy_shape[it]} = {probs[it]:.2f}'
+    it+=1
+
+text = f'ID: {gal_id}{text}'
+
+# Place text in the white space (right 20% of the figure)
+fig.text(0.9, 0.5, text, fontsize= 20, ha='center', va='center')
+plt.savefig('Galaxy_Example.png', bbox_inches='tight')
+plt.close()
+
 
 
