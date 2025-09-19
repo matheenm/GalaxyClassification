@@ -86,7 +86,7 @@ Test sample RMSE error =  0.1069
 ## Example classifications
 
 ![test1](https://github.com/matheenm/GalaxyClassification/blob/main/Images/test_1.png)
-![test2](https://github.com/matheenm/GalaxyClassification/blob/main/Images/Test_2.png)
+![test2](https://github.com/matheenm/GalaxyClassification/blob/main/Images/test_2.png)
 
 ## Reference
 Willett K.W., Lintott C.J., Bamford S.P., Masters K.L., Simmons B.D., Casteels K.R.V., Edmondson E.M., et al., 2013, MNRAS, 435, 2835. [doi:10.1093/mnras/stt1458](https://doi.org/10.1093/mnras/stt1458)
